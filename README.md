@@ -1,13 +1,9 @@
-# Phase 1
+# 소프트웨어개발도구및환경실습 5주차
 
-## 요약
-간단한 Linux 쉘을 구현하고 테스트
 
-## 기본 명령어
-cd, ls, mkdir, rmdir, touch, cat, exit
+## 리눅스
+-putty를 사용
 
-## 프로세스 관리
-parent process가 child process를 생성 후, child process가 명령어를 동작시킴
-
-## 인터페이스
-명령어 입력/ 결과 출력
+## 로컬 저장소와 원격 저장소
+-push
+-pull
