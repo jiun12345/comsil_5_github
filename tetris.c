@@ -261,7 +261,7 @@ void DrawChange(char f[HEIGHT][WIDTH],int command,int currentBlock,int blockRota
 			prevRotate = (blockRotate + 3) % 4; // 회전하기
 			break;
 		case KEY_DOWN:
-			prevY = blockY - 1; // 아래로 이동하기
+			prevY = blockY; // 아래로 이동하기
 			break;
 		case KEY_RIGHT:
 			prevX = blockX - 1; // 왼쪽으로 이동하기
@@ -284,6 +284,7 @@ void BlockDown(int sig){
 	// 강의자료 p26-27의 플로우차트를 참고한다.
 	//1. blockY를 1증가 시킨다.
 	blockY++;
+	DrawBlock(blockY,blockX,nextBlock[0],blockRotate,'.');
 	//2. CheckToMove 함수를 호출하여, 블럭이 더이상 내려갈 수 있는지 확인한다.
 	//   이 때, 블럭이 더이상 내려갈 수 없으면, gameOver을 1로 설정하고,
 	//   AddBlockToField 함수를 호출하여, 블럭을 필드에 추가시킨다.
@@ -296,6 +297,9 @@ void BlockDown(int sig){
 		DeleteLine(field);
 		score++;
 		InitTetris();
+
+		// 게임 보드 업데이트
+		DrawField();
 	}
 	//3. timed_out를 0으로 설정하여, 다음 타이머가 작동하도록 한다.
 	timed_out=0;
@@ -306,7 +310,7 @@ void AddBlockToField(char f[HEIGHT][WIDTH],int currentBlock,int blockRotate, int
 	for(i = 0; i < BLOCK_HEIGHT; i++) {
 		for(j = 0; j < BLOCK_WIDTH; j++) {
 			if(block[currentBlock][blockRotate][i][j] == 1) {
-				if(blockY + i >= 0 && blockY + i < HEIGHT && blockX + j >= 0 && blockX + j < WIDTH) {
+				if(blockY + i >= 0 && blockY + i < HEIGHT && blockX + j >= 0 && blockX + j < WIDTH && f[blockY + i][blockX + j] == 0) {
 					f[blockY + i][blockX + j] = 1;
 				}
 			}
@@ -329,10 +333,12 @@ int DeleteLine(char f[HEIGHT][WIDTH]){
 		//2. 꽉 찬 구간이 있으면, line을 1증가 시킨다.
 		if (flag) {
 			line++;
-			for (j = i; j > 0; j--) {
+			for (j = i; j > 0 && j < HEIGHT; j--) {
 				memcpy(f[j], f[j - 1], sizeof(f[0]));
 			}
-			memset(f[0], 0, sizeof(f[0]));
+			if(i < HEIGHT){
+				memset(f[0], 0, sizeof(f[0]));
+			}
 		}
 	}
 
