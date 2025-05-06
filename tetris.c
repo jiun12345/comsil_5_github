@@ -168,7 +168,7 @@ void DrawBlock(int y, int x, int blockID,int blockRotate,char tile){
 			}
 		}
 
-	//move(HEIGHT,WIDTH+10);
+	move(HEIGHT,WIDTH+10);
 }
 
 void DrawBox(int y,int x, int height, int width){
@@ -261,7 +261,7 @@ void DrawChange(char f[HEIGHT][WIDTH],int command,int currentBlock,int blockRota
 			prevRotate = (blockRotate + 3) % 4; // 회전하기
 			break;
 		case KEY_DOWN:
-			prevY = blockY; // 아래로 이동하기
+			prevY = blockY - 1; // 아래로 이동하기
 			break;
 		case KEY_RIGHT:
 			prevX = blockX - 1; // 왼쪽으로 이동하기
@@ -278,26 +278,44 @@ void DrawChange(char f[HEIGHT][WIDTH],int command,int currentBlock,int blockRota
 
 	// 새로운 블럭 그리기
 	DrawBlock(blockY, blockX, currentBlock, blockRotate, ' ');
+
+	// 화면 갱신
+	refresh();
 }
 
 void BlockDown(int sig){
 	// 강의자료 p26-27의 플로우차트를 참고한다.
 	//1. blockY를 1증가 시킨다.
-
+	blockY++;
 	//2. CheckToMove 함수를 호출하여, 블럭이 더이상 내려갈 수 있는지 확인한다.
 	//   AddBlockToField 함수를 호출하여, 블럭을 필드에 추가시킨다.
 	//   그리고 DeleteLine 함수를 호출하여, 꽉찬 구간이 있으면 지운다.
 	//   그리고, score를 1증가 시킨다.
 	//   그리고, next block을 준비시킨다.
 	if(CheckToMove(field,nextBlock[0],blockRotate,blockY,blockX)==0){
+		blockY--;
 		AddBlockToField(field,nextBlock[0],blockRotate,blockY,blockX);
-		DeleteLine(field);
-		score++;
-		InitTetris();
-	} else {
-		blockY++;
-		DrawBlock(blockY,blockX,nextBlock[0],blockRotate,'.');
+		int linesCleared = DeleteLine(field);
+		score += linesCleared * linesCleared * 100; // 점수 증가
+
+		// 게임 오버 조건 확인
+		if (blockY < 0) {
+			gameOver = 1;
+		} else {
+			// 다음 블럭 준비
+			nextBlock[0] = nextBlock[1];
+			nextBlock[1] = rand() % 7;
+			blockRotate = 0;
+			blockY = -1;
+			blockX = WIDTH / 2 - 2;
+			DrawNextBlock(nextBlock);
+		}
 	}
+
+	// 화면 갱신
+	DrawField();
+	refresh();
+
 	//3. timed_out를 0으로 설정하여, 다음 타이머가 작동하도록 한다.
 	timed_out=0;
 }
